@@ -14,8 +14,7 @@ using namespace std;
 
 #include <cstring> // for strtok and strcpy
 
-int hashCode(const string& key)
-{
+int hashCode(const string& key){
   int result = 0;
   for (int i = 0; i < key.length(); i++)
     result += key.at(i);
@@ -29,7 +28,7 @@ int main(){
   cout << "Programmer's ID: 1553428\n";
   cout << "File: " << __FILE__ << endl;
 
-  // for parsing the inputfile
+  // for parsing the input file
   char* token;
   char buf[1000];
   const char* const tab = "\t";
@@ -39,16 +38,15 @@ int main(){
   fin.open("dvc-schedule.txt");
   if (!fin.good()) throw "I/O error";
 
-//  DynamicArray<string> alreadySeen;
-//  DynamicArray<CInfo> recordKeep;
   HashTable<string, bool, 74411> seen(hashCode);
   HashTable<string, int, 188> count(hashCode);
   int duplicates = 0;
   int county = 0;
+
   // read the input file
-  while (fin.good()){
+  while(fin.good()){
     county++;
-    cout << (county/74411) * 100 << "% \r";
+    cout << "lines parsed: " << county << "\r";
     cout.flush();
     // read the line
     string line;
@@ -66,21 +64,16 @@ int main(){
     const string subjectCode(course.begin(), course.begin() + course.find('-'));
 
     string key = term + "," +section;
-    bool found = false;
-    for (int i = 0; i < seen.size(); i++){
-    	if (seen.containsKey(key)){
-    		found = true;
-        duplicates++;
-        break;
-    	}
+    if (seen.containsKey(key)){
+      duplicates++;
     }
-
-    if(!found){
+    else{
       seen[key] = true;
       count[subjectCode]++;
     }
   }
   fin.close();
+
   cout << "number of duplicates: " << duplicates << endl;
 
   queue<string> q = count.keys();
@@ -92,6 +85,6 @@ int main(){
   }
 
   for(auto& i : s) {
-    cout << i << ": " << seen[i] << endl;
+    cout << i << ": " << count[i] << endl;
   }
 }

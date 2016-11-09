@@ -1,4 +1,8 @@
+// Programmer: Dhanush Patel
+// Programmer's ID: 1553428
+
 #include <iostream>
+#include <map>
 using namespace std;
 
 #include <cstdlib>
@@ -8,13 +12,14 @@ struct cell
   int row; // any +/0/- value
   int col; // any +/0/- value
 };
-int hashCode(const cell& c){return 1009 * c.row + c.col;}
-bool operator==(const cell& a, const cell& b) {return hashCode(a) == hashCode(b);}
 
-#include "HashTable.h"
+bool operator<(const cell& a, const cell& b)
+{
+  return ((1000 * a.row) + a.col) < ((1000 * b.row) + b.col);
+}
 
-HashTable<cell, char, 1000> grid(hashCode); // Older grid of life
-HashTable<cell, char, 1000> newGrid(hashCode); // New grid for storing the next generation
+map<cell, char> grid; // Older grid of life
+map<cell, char> newGrid; // New grid for storing the next generation
 
 //Dimensions of the grid with the origin at the center
 const int MINROW = -25;
@@ -30,7 +35,7 @@ int neighborCount(int row, int col)
   for (temp.row = row - 1; temp.row <= row + 1; temp.row++)
     for (temp.col = col - 1; temp.col <= col + 1; temp.col++)
       if (temp.row != row || temp.col != col)
-        if (grid.containsKey(temp))
+        if (grid.count(temp) > 0)
           ++count;
   return count;
 }
@@ -64,16 +69,13 @@ void print()
   for (temp.row = MINROW; temp.row <= MAXROW; temp.row++)
   {
     for (temp.col = MINCOL; temp.col <= MAXCOL; temp.col++)
-      if (grid.containsKey(temp))
+      if (grid.count(temp) > 0)
         cout << grid[temp];
       else
         cout << ' ';
     cout << endl;
   }
   cout << endl;
-
-  cout << "grid size " << grid.size() << endl;
-  cout << "oldGrid size " << newGrid.size() << endl;
 }
 
 void update()
@@ -81,20 +83,14 @@ void update()
   //Calculate new generation
   cell temp;
   newGrid.clear();
-//  if(newGrid.keys().size()!=0){
-//    cout << "not erased!!!";
-//  }
   //Nested for loops to traverse the grid
-  for (temp.row = MINROW; temp.row <= MAXROW; temp.row++)
-  {
-    for (temp.col = MINCOL; temp.col <= MAXCOL; temp.col++)
-    {
+  for (temp.row = MINROW; temp.row <= MAXROW; temp.row++){
+    for (temp.col = MINCOL; temp.col <= MAXCOL; temp.col++){
       //Process cells based on number of neighbors
-      switch (neighborCount(temp.row, temp.col))
-      {
+      switch (neighborCount(temp.row, temp.col)){
         //If 2 neighbors, cell lives (copy old cell to next gen grid)
         case 2:
-          if (grid.containsKey(temp)) newGrid[temp] = 'X';
+          if (grid.count(temp) > 0) newGrid[temp] = 'X';
           break;
         //Cell with 3 neighbors lives next generation
         case 3:
@@ -106,7 +102,6 @@ void update()
 
   //Update grid
   grid = newGrid;
-  cout << "updated grid with newgrid???" << endl;
 };
 
 int main()
